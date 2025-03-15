@@ -33,9 +33,17 @@ class My_Classifier_Model:
         data["CryoSleep"] = data["CryoSleep"].astype(bool).fillna(False).astype(int)
         data["VIP"] = data["VIP"].astype(bool).fillna(False).astype(int)
 
-        numeric_columns = ["RoomService", "FoodCourt", "ShoppingMall", "Spa", "VRDeck", "Age"
-            , "CryoSleep", "VIP"
-                           ]
+        # Пробую с суммой всех трат
+        spends_columns = ['RoomService', 'FoodCourt', 'ShoppingMall', 'Spa', 'VRDeck']
+        data["Spends"] = data[spends_columns].sum(axis=1)
+
+        data["NoSpends"] = (data["Spends"] == 0)
+        # print(data.head())
+
+        numeric_columns = [
+            'RoomService', 'FoodCourt', 'ShoppingMall', 'Spa', 'VRDeck', "Spends",
+            "NoSpends", "Age", "CryoSleep", "VIP"
+        ]
         numerics = data.copy()[numeric_columns]
 
         columns_for_dummies = ["HomePlanet", "Destination"]
@@ -58,18 +66,19 @@ class My_Classifier_Model:
         def objective(trial):
             param = {
                 "objective": "binary",
-                "metric": "auc",
+                "metric": "",
                 "boosting_type": "gbdt",
-                "n_estimators": trial.suggest_int("n_estimators", 100, 1000),
-                "learning_rate": trial.suggest_float("learning_rate", 1e-3, 0.1, log=True),
-                "num_leaves": trial.suggest_int("num_leaves", 20, 200, step=10),
-                "max_depth": trial.suggest_int("max_depth", 3, 10),
+                # "is_provide_training_metric" : True,
+                "n_estimators": trial.suggest_int("n_estimators", 100, 1500),
+                "learning_rate": 0.043,
+                "num_leaves": trial.suggest_int("num_leaves", 20, 100, step=10),
+                "max_depth": trial.suggest_int("max_depth", 3, 5, step=1),
                 "min_child_samples": trial.suggest_int("min_child_samples", 20, 200),
                 "subsample": trial.suggest_float("subsample", 0.4, 1.0),
-                "colsample_bytree": trial.suggest_float("colsample_bytree", 0.4, 1.0),
+                "colsample_bytree": trial.suggest_float("colsample_bytree", 0.3, 1.0),
                 "reg_alpha": trial.suggest_float("reg_alpha", 1e-3, 10.0, log=True),
-                "reg_lambda": trial.suggest_float("reg_lambda", 1e-3, 10.0, log=True),
-                "random_state": trial.suggest_int("random_state", 1, 200, step=1),
+                "reg_lambda": trial.suggest_float("reg_lambda", 1e-3, 12.0, log=True),
+                "random_state": trial.suggest_int("random_state", 2, 100, step=2),
                 "n_jobs": -1,
                 "verbose": -1
             }
@@ -80,11 +89,12 @@ class My_Classifier_Model:
             return auc
 
         study = optuna.create_study(direction="maximize")
-        study.optimize(objective, n_trials=500, show_progress_bar=True)
+        study.optimize(objective, n_trials=100, show_progress_bar=True)
 
         trial = study.best_trial
 
         best_params = trial.params
+        print(best_params)
         best_params["verbose"] = -1
         best_model = lgb.LGBMClassifier(**best_params)
         best_model.fit(X, y)
