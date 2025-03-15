@@ -2,6 +2,9 @@ import argparse
 import optuna
 import pandas as pd
 import lightgbm as lgb
+from xgboost import XGBClassifier
+# from lightgbm import LGBMClassifier
+from catboost import CatBoostClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import roc_auc_score
 
@@ -61,17 +64,80 @@ class My_Classifier_Model:
         y = train_data["Transported"]
         X = self._data_preparations(train_data)
 
-        X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2, random_state=42)
+        # X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2, random_state=42)
+        #
+        # def objective(trial):
+        #     param = {
+        #         "objective": "binary",
+        #         "metric": "",
+        #         "boosting_type": trial.suggest_categorical('boosting_type', ['gbdt', 'dart', 'goss']),
+        #         # "is_provide_training_metric" : True,
+        #         "n_estimators": trial.suggest_int("n_estimators", 100, 1500),
+        #         "learning_rate": 0.043,
+        #         "num_leaves": trial.suggest_int("num_leaves", 20, 150),
+        #         "max_depth": trial.suggest_int("max_depth", 3, 5, step=1),
+        #         "min_child_samples": trial.suggest_int("min_child_samples", 20, 200),
+        #         "subsample": trial.suggest_float("subsample", 0.4, 1.0),
+        #         "colsample_bytree": trial.suggest_float("colsample_bytree", 0.3, 1.0),
+        #         "reg_alpha": trial.suggest_float("reg_alpha", 1e-3, 10.0, log=True),
+        #         "reg_lambda": trial.suggest_float("reg_lambda", 1e-3, 12.0, log=True),
+        #         "random_state": trial.suggest_int("random_state", 2, 100, step=2),
+        #         "n_jobs": -1,
+        #         "verbose": -1
+        #     }
+        #     model = lgb.LGBMClassifier(**param)
+        #     model.fit(X_train, y_train)
+        #     predictions = model.predict(X_val)
+        #     auc = roc_auc_score(y_val, predictions)
+        #     return auc
+        #
+        # study = optuna.create_study(direction="maximize")
+        # study.optimize(objective, n_trials=100, show_progress_bar=True)
+        #
+        # trial = study.best_trial
+        #
+        # best_params = trial.params
+        # print(best_params)
+        # best_params["verbose"] = -1
+        # best_model = lgb.LGBMClassifier(**best_params)
+        # best_model.fit(X, y)
+        #
+        # best_model.booster_.save_model("./data/model/trained_model.txt")
 
-        def objective(trial):
+        X_train, X_valid, y_train, y_valid = train_test_split(X, y, test_size=0.2, random_state=42)
+
+        def objective_xgb(trial):
+            param = {
+                'objective': 'binary:logistic',
+                'eval_metric': 'auc',
+                'booster': trial.suggest_categorical('booster', ['gbtree', 'gblinear', 'dart']),
+                'lambda': trial.suggest_float('lambda', 1e-3, 10.0, log=True),
+                'alpha': trial.suggest_float('alpha', 1e-3, 10.0, log=True),
+                'learning_rate': trial.suggest_float('learning_rate', 1e-3, 1e-1, log=True),
+                'n_estimators': trial.suggest_int('n_estimators', 100, 1000),
+                'max_depth': trial.suggest_int('max_depth', 3, 9),
+                'min_child_weight': trial.suggest_int('min_child_weight', 1, 10),
+                'gamma': trial.suggest_float('gamma', 1e-3, 10.0, log=True),
+                'subsample': trial.suggest_float('subsample', 0.5, 1.0),
+                'colsample_bytree': trial.suggest_float('colsample_bytree', 0.5, 1.0),
+            }
+
+            model = XGBClassifier(**param)
+            model.fit(X_train, y_train)
+
+            preds = model.predict_proba(X_valid)[:, 1]
+            auc = roc_auc_score(y_valid, preds)
+            return auc
+
+        def objective_lgbm(trial):
             param = {
                 "objective": "binary",
                 "metric": "",
-                "boosting_type": "gbdt",
+                "boosting_type": trial.suggest_categorical('boosting_type', ['gbdt', 'dart', 'goss']),
                 # "is_provide_training_metric" : True,
                 "n_estimators": trial.suggest_int("n_estimators", 100, 1500),
                 "learning_rate": 0.043,
-                "num_leaves": trial.suggest_int("num_leaves", 20, 100, step=10),
+                "num_leaves": trial.suggest_int("num_leaves", 20, 150),
                 "max_depth": trial.suggest_int("max_depth", 3, 5, step=1),
                 "min_child_samples": trial.suggest_int("min_child_samples", 20, 200),
                 "subsample": trial.suggest_float("subsample", 0.4, 1.0),
@@ -82,32 +148,77 @@ class My_Classifier_Model:
                 "n_jobs": -1,
                 "verbose": -1
             }
+
             model = lgb.LGBMClassifier(**param)
             model.fit(X_train, y_train)
-            predictions = model.predict(X_val)
-            auc = roc_auc_score(y_val, predictions)
+
+            preds = model.predict_proba(X_valid)[:, 1]
+            auc = roc_auc_score(y_valid, preds)
             return auc
 
-        study = optuna.create_study(direction="maximize")
-        study.optimize(objective, n_trials=100, show_progress_bar=True)
+        def objective_catboost(trial):
+            param = {
+                'loss_function': 'Logloss',
+                'iterations': trial.suggest_int('iterations', 500, 2000),
+                'depth': trial.suggest_int('depth', 4, 10),
+                'learning_rate': trial.suggest_float('learning_rate', 1e-3, 1e-1, log=True),
+                'random_strength': trial.suggest_float('random_strength', 1e-3, 10.0, log=True),
+                'bagging_temperature': trial.suggest_float('bagging_temperature', 1e-3, 10.0, log=True),
+                'border_count': trial.suggest_int('border_count', 32, 255),
+                'l2_leaf_reg': trial.suggest_float('l2_leaf_reg', 1e-3, 10.0, log=True),
+            }
 
-        trial = study.best_trial
+            model = CatBoostClassifier(**param,iterations=1000)
+            model.fit(X_train, y_train)
 
-        best_params = trial.params
-        print(best_params)
-        best_params["verbose"] = -1
-        best_model = lgb.LGBMClassifier(**best_params)
-        best_model.fit(X, y)
+            preds = model.predict_proba(X_valid)[:, 1]
+            auc = roc_auc_score(y_valid, preds)
+            return auc
 
-        best_model.booster_.save_model("./data/model/trained_model.txt")
+        # study_xgb = optuna.create_study(direction='maximize')
+        # study_lgbm = optuna.create_study(direction='maximize')
+        study_catboost = optuna.create_study(direction='maximize')
+
+        # study_xgb.optimize(objective_xgb, n_trials=5)
+        # study_lgbm.optimize(objective_lgbm, n_trials=5)
+        study_catboost.optimize(objective_catboost, n_trials=2)
+
+        # best_trial_xgb = study_xgb.best_trial.params
+        # best_trial_lgbm = study_lgbm.best_trial.params
+        best_trial_catboost = study_catboost.best_trial.params
+
+        # print('Best trial for XGBoost:', best_trial_xgb)
+        # print('Best trial for LightGBM:', best_trial_lgbm)
+        print('Best trial for CatBoost:', best_trial_catboost)
+
+        # best_xgb = XGBClassifier(**study_xgb.best_trial.params)
+        # best_xgb.fit(X_train, y_train)
+        # auc_xgb = roc_auc_score(y_valid, best_xgb.predict_proba(X_valid)[:, 1])
+        #
+        # best_lgbm = lgb.LGBMClassifier(**study_lgbm.best_trial.params)
+        # best_lgbm.fit(X_train, y_train)
+        # auc_lgbm = roc_auc_score(y_valid, best_lgbm.predict_proba(X_valid)[:, 1])
+
+        best_catboost = CatBoostClassifier(**study_catboost.best_trial.params, verbose=0)
+        best_catboost.fit(X_train, y_train)
+        # auc_catboost = roc_auc_score(y_valid, best_catboost.predict_proba(X_valid)[:, 1])
+
+        # # Print the best AUC scores for each algorithm
+        # print(f'Best AUC for XGBoost: {auc_xgb:.4f}')
+        # print(f'Best AUC for LightGBM: {auc_lgbm:.4f}')
+        # print(f'Best AUC for CatBoost: {auc_catboost:.4f}')
+
+        best_catboost.save_model('./data/model/catboost_model.cbm')
         return
 
     # Функция для предсказания при помощи сохраненной модели
     def predict(self, path_to_dataset):
         test_data = pd.read_csv(path_to_dataset)
         X_test = self._data_preparations(test_data)
-        model = lgb.Booster(model_file="./data/model/trained_model.txt")
-        print(model.params)
+        # model = lgb.Booster(model_file="./data/model/trained_model.txt")
+        model = CatBoostClassifier()
+        model.load_model('./data/model/catboost_model.cbm')
+        # print(model.params)
         predictions = model.predict(X_test)
         predictions = (predictions > 0.5).astype(int)
         output = pd.DataFrame({'PassengerId': test_data.PassengerId, 'Transported': predictions})

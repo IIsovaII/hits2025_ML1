@@ -1,5 +1,5 @@
 # Me
-### Sofya Kovalenko 972303
+### Sofia Kovalenko 972303
 
 ---
 # What is it
@@ -38,7 +38,7 @@ python ./model/model.py predict --dataset=/path/to/dataset
 - Replace `/path/to/dataset` with the path to the dataset for which you want predictions.
 - The predictions will be generated and saved in `./data/results.csv`.
 - You can use `./data/inputs/test.csv` as train dataset
-- 
+
 ---
 
 # Resources
