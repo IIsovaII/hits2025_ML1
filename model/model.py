@@ -7,9 +7,37 @@ from xgboost import XGBClassifier
 from catboost import CatBoostClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import roc_auc_score
+import sys
+import logging
+import warnings
+from logger import SingletonLogger
+
+logger = SingletonLogger().get_logger()
+optuna_logger = optuna.logging.get_logger("optuna")
+optuna_logger.handlers = logger.handlers
+
+# logging.captureWarnings(True)
+# warnings.filterwarnings("always")
+
+class LoggerWriter:
+    def __init__(self, logger, level):
+        self.logger = logger
+        self.level = level
+
+    def write(self, message):
+        if message.strip():  # Игнорируем пустые строки
+            self.logger.log(self.level, message.strip())
+
+    def flush(self):
+        pass  # Не требуется для логгера
+
+# Перенаправляем stdout и stderr в логгер
+sys.stdout = LoggerWriter(logger, logging.INFO)
+sys.stderr = LoggerWriter(logger, logging.ERROR)
 
 
 class My_Classifier_Model:
+
     # Приватный метод класса для заполнения отсутствующих значений в данных
     def _fill_missing_values(self, data):
         numeric_data = [column for column in data.select_dtypes(["int", "float"])]
@@ -60,6 +88,7 @@ class My_Classifier_Model:
 
     # Функция для обучения модели и её сохранения
     def train(self, path_to_dataset):
+        logger.info("Начало обучения модели")
         train_data = pd.read_csv(path_to_dataset)
         y = train_data["Transported"]
         X = self._data_preparations(train_data)
@@ -159,7 +188,7 @@ class My_Classifier_Model:
         def objective_catboost(trial):
             param = {
                 'loss_function': 'Logloss',
-                'iterations': trial.suggest_int('iterations', 500, 2000),
+                'iterations': 100,
                 'depth': trial.suggest_int('depth', 4, 10),
                 'learning_rate': trial.suggest_float('learning_rate', 1e-3, 1e-1, log=True),
                 'random_strength': trial.suggest_float('random_strength', 1e-3, 10.0, log=True),
@@ -168,7 +197,7 @@ class My_Classifier_Model:
                 'l2_leaf_reg': trial.suggest_float('l2_leaf_reg', 1e-3, 10.0, log=True),
             }
 
-            model = CatBoostClassifier(**param,iterations=1000)
+            model = CatBoostClassifier(**param, verbose=0)
             model.fit(X_train, y_train)
 
             preds = model.predict_proba(X_valid)[:, 1]
@@ -181,7 +210,7 @@ class My_Classifier_Model:
 
         # study_xgb.optimize(objective_xgb, n_trials=5)
         # study_lgbm.optimize(objective_lgbm, n_trials=5)
-        study_catboost.optimize(objective_catboost, n_trials=2)
+        study_catboost.optimize(objective_catboost, n_trials=3)
 
         # best_trial_xgb = study_xgb.best_trial.params
         # best_trial_lgbm = study_lgbm.best_trial.params
@@ -209,6 +238,7 @@ class My_Classifier_Model:
         # print(f'Best AUC for CatBoost: {auc_catboost:.4f}')
 
         best_catboost.save_model('./data/model/catboost_model.cbm')
+        logger.info("Обучение модели завершено")
         return
 
     # Функция для предсказания при помощи сохраненной модели
