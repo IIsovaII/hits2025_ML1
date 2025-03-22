@@ -10,7 +10,7 @@ Competition: https://www.kaggle.com/competitions/tsumladvanced2025.
 
 The project contains jupyter notebooks in `/notebooks`, where I tried to study the input data of the competition, experimented with the models. 
 
-The final model is wrapped in a CLI application, the model code is in `./model/model.py`.
+The final model is wrapped in a CLI application, the model code is in `./model/model.py`. The final solution uses CatBoostClassifier.
 
 ---
 # How to
@@ -53,4 +53,8 @@ Here is what I used and studied for this project:
 - **Info about logging**: https://habr.com/ru/companies/wunderfund/articles/683880/
 - **More info about logging**: https://medium.com/@balakrishnamaduru/mastering-logging-in-python-a-singleton-logger-with-dynamic-log-levels-17f3e8bfa2cf
 - **Logging in python documentation**: https://docs.python.org/3/library/logging.html
+- **Pyplot tutorial**: https://cpp-python-nsu.inp.nsk.su/textbook/sec4/ch8
+- **Seaborn Documentation**: https://seaborn.pydata.org/index.html
+- **ClearML Documentation**: https://clear.ml/docs/latest/docs/
+- **ClearML tutorial**: https://habr.com/ru/articles/691314/
 ---
