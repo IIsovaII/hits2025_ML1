@@ -19,3 +19,13 @@
 2025-03-23 01:06:52,652 - root - ERROR - C:\Users\IIsovaII\PycharmProjects\PythonProject\.venv\Lib\site-packages\tqdm\std.py:636: TqdmWarning: clamping frac to range [0, 1]
   full_bar = Bar(frac,
 2025-03-23 01:06:52,657 - root - ERROR - ################################# 100% | 4.01/4.01 MB [00:30<00:00,  7.61s/MB]:
+2025-03-23 03:26:09,496 - root - INFO - Ќачало предсказани€ с использованием обученной модели
+2025-03-23 03:26:09,781 - root - ERROR - C:\Users\IIsovaII\PycharmProjects\PythonProject\model\model.py:73: FutureWarning: Downcasting object dtype arrays on .fillna, .ffill, .bfill is deprecated and will change in a future version. Call result.infer_objects(copy=False) instead. To opt-in to the future behavior, set `pd.set_option('future.no_silent_downcasting', True)`
+  data[col] = data[col].fillna(data[col].mode()[0])
+2025-03-23 03:26:09,849 - root - ERROR - C:\Users\IIsovaII\PycharmProjects\PythonProject\model\model.py:73: FutureWarning: Downcasting object dtype arrays on .fillna, .ffill, .bfill is deprecated and will change in a future version. Call result.infer_objects(copy=False) instead. To opt-in to the future behavior, set `pd.set_option('future.no_silent_downcasting', True)`
+  data[col] = data[col].fillna(data[col].mode()[0])
+2025-03-23 03:26:20,365 - root - ERROR - 0% | 0.00/2.42 MB [00:00<?, ?MB/s]:
+2025-03-23 03:26:27,853 - root - INFO - ѕредсказание завершено, результаты сохранены
+2025-03-23 03:26:30,573 - root - ERROR - #########################1         76% | 1.84/2.42 MB [00:10<00:03,  5.47s/MB]:
+2025-03-23 03:26:36,490 - root - ERROR - ################################# 100% | 2.42/2.42 MB [00:16<00:00,  6.95s/MB]:
+2025-03-23 03:26:37,448 - root - ERROR - ################################9 100% | 2.41/2.42 MB [00:16<00:00,  7.03s/MB]:
