@@ -50,5 +50,7 @@ Here is what I used and studied for this project:
 - **Optuna Documentation**: [https://optuna.readthedocs.io/en/stable/index.html](https://optuna.readthedocs.io/en/stable/index.html)
 - **LightGBM Documentation**: [https://lightgbm.readthedocs.io/en/v3.3.5/index.html](https://lightgbm.readthedocs.io/en/v3.3.5/index.html)
 - **Pandas in Python**: [https://docs-python.ru/packages/modul-pandas-analiz-dannykh-python/](https://docs-python.ru/packages/modul-pandas-analiz-dannykh-python/)
-
+- **Info about logging**: https://habr.com/ru/companies/wunderfund/articles/683880/
+- **More info about logging**: https://medium.com/@balakrishnamaduru/mastering-logging-in-python-a-singleton-logger-with-dynamic-log-levels-17f3e8bfa2cf
+- **Logging in python documentation**: https://docs.python.org/3/library/logging.html
 ---

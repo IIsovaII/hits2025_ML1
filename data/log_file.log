@@ -1,4 +1,21 @@
-2025-03-19 05:39:08,060 - root - ERROR - C:\Users\IIsovaII\PycharmProjects\PythonProject\model\model.py:50: FutureWarning: Downcasting object dtype arrays on .fillna, .ffill, .bfill is deprecated and will change in a future version. Call result.infer_objects(copy=False) instead. To opt-in to the future behavior, set `pd.set_option('future.no_silent_downcasting', True)`
-  data[col] = data[col].fillna(data[col].value_counts().index[0]).infer_objects(copy=False)
-2025-03-19 05:39:08,296 - root - ERROR - C:\Users\IIsovaII\PycharmProjects\PythonProject\model\model.py:50: FutureWarning: Downcasting object dtype arrays on .fillna, .ffill, .bfill is deprecated and will change in a future version. Call result.infer_objects(copy=False) instead. To opt-in to the future behavior, set `pd.set_option('future.no_silent_downcasting', True)`
-  data[col] = data[col].fillna(data[col].value_counts().index[0]).infer_objects(copy=False)
+2025-03-23 01:05:43,112 - root - INFO - Начало обучения модели
+2025-03-23 01:05:43,423 - root - ERROR - C:\Users\IIsovaII\PycharmProjects\PythonProject\model\model.py:239: FutureWarning: Downcasting object dtype arrays on .fillna, .ffill, .bfill is deprecated and will change in a future version. Call result.infer_objects(copy=False) instead. To opt-in to the future behavior, set `pd.set_option('future.no_silent_downcasting', True)`
+  data[col] = data[col].fillna(data[col].mode()[0])
+2025-03-23 01:05:43,492 - root - ERROR - C:\Users\IIsovaII\PycharmProjects\PythonProject\model\model.py:239: FutureWarning: Downcasting object dtype arrays on .fillna, .ffill, .bfill is deprecated and will change in a future version. Call result.infer_objects(copy=False) instead. To opt-in to the future behavior, set `pd.set_option('future.no_silent_downcasting', True)`
+  data[col] = data[col].fillna(data[col].mode()[0])
+2025-03-23 01:05:43,513 - optuna.storages._in_memory - INFO - A new study created in memory with name: no-name-8d6458dd-49a4-4c2a-9941-2e0794cb76e6
+2025-03-23 01:05:45,973 - optuna.study.study - INFO - Trial 0 finished with value: 0.886990414811405 and parameters: {'depth': 8, 'learning_rate': 0.043392150020312166, 'random_strength': 0.9846721383879907, 'bagging_temperature': 0.001098895368937331, 'border_count': 121, 'l2_leaf_reg': 0.0018016907139541617}. Best is trial 0 with value: 0.886990414811405.
+2025-03-23 01:05:48,498 - optuna.study.study - INFO - Trial 1 finished with value: 0.8633588109392321 and parameters: {'depth': 6, 'learning_rate': 0.008901427789998119, 'random_strength': 2.097036896220316, 'bagging_temperature': 0.00174328138718137, 'border_count': 200, 'l2_leaf_reg': 0.030999535013633558}. Best is trial 0 with value: 0.886990414811405.
+2025-03-23 01:05:50,176 - optuna.study.study - INFO - Trial 2 finished with value: 0.8623852118768504 and parameters: {'depth': 8, 'learning_rate': 0.0012334271844908365, 'random_strength': 1.9910159262980758, 'bagging_temperature': 0.012248257848515146, 'border_count': 32, 'l2_leaf_reg': 0.013051668323634828}. Best is trial 0 with value: 0.886990414811405.
+2025-03-23 01:05:50,179 - root - INFO - Лучшие параметры: {'depth': 8, 'learning_rate': 0.043392150020312166, 'random_strength': 0.9846721383879907, 'bagging_temperature': 0.001098895368937331, 'border_count': 121, 'l2_leaf_reg': 0.0018016907139541617}
+2025-03-23 01:06:12,026 - root - INFO - Обучение модели завершено
+2025-03-23 01:06:22,029 - root - ERROR - 0% | 0.00/4.01 MB [00:00<?, ?MB/s]:
+2025-03-23 01:06:32,226 - root - ERROR - ################7                  51% | 2.03/4.01 MB [00:10<00:09,  4.97s/MB]:
+2025-03-23 01:06:42,246 - root - ERROR - #########################          76% | 3.05/4.01 MB [00:20<00:06,  7.01s/MB]:
+2025-03-23 01:06:51,726 - root - ERROR - ################################9 100% | 4.00/4.01 MB [00:29<00:00,  8.06s/MB]:
+2025-03-23 01:06:52,032 - root - ERROR - C:\Users\IIsovaII\PycharmProjects\PythonProject\.venv\Lib\site-packages\tqdm\std.py:636: TqdmWarning: clamping frac to range [0, 1]
+  full_bar = Bar(frac,
+2025-03-23 01:06:52,038 - root - ERROR - ################################# 100% | 4.01/4.01 MB [00:29<00:00,  8.17s/MB]:
+2025-03-23 01:06:52,652 - root - ERROR - C:\Users\IIsovaII\PycharmProjects\PythonProject\.venv\Lib\site-packages\tqdm\std.py:636: TqdmWarning: clamping frac to range [0, 1]
+  full_bar = Bar(frac,
+2025-03-23 01:06:52,657 - root - ERROR - ################################# 100% | 4.01/4.01 MB [00:30<00:00,  7.61s/MB]:

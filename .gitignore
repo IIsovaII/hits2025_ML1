@@ -1,10 +1,9 @@
-.catboost_info/
 .idea/
 
 __pycache__/
 *.py[cod]
 
-venv/
+.venv/
 .env
 
 dist/
@@ -15,3 +14,5 @@ dist/
 .cache/
 
 .ipynb_checkpoints
+/catboost_info/
+/notebooks/catboost_info/
